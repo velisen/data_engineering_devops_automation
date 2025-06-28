@@ -27,4 +27,4 @@ def generate_temperature_csv(filename, num_records = 1000):
     
 
 if __name__ == "__main__":
-    generate_temperature_csv("data/temperature.csv")
+    generate_temperature_csv("data/temperature_data.csv")
