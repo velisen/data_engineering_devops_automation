@@ -54,6 +54,11 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "raw_data" {
 
 }
 
+resource "aws_s3_object" "data_directory" {
+  bucket = aws_s3_bucket.raw_data.id,
+  key = "data/"
+}
+
 resource "aws_s3_object" "temperature_data" {
   bucket       = aws_s3_bucket.raw_data.id
   key          = "data/temperature_data.csv"
@@ -104,4 +109,40 @@ resource "aws_glue_catalog_database" "main" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+resource "aws_glue_crawler" "name" {
+  name          = "dml-temperature-analysis-crawler"
+  database_name = aws_glue_catalog_database.main.name
+  role          = aws_iam_role.glue_role.name
+  schedule      = "cron(0 1 * * ? *)"
+
+  s3_target {
+    path = "s3://${aws_s3_bucket.raw_data.id}/data/"
+  }
+  schema_change_policy {
+    delete_behavior = "LOG"
+    update_behavior = "UPDATE_IN_DATABASE"
+  }
+  recrawl_policy {
+    recrawl_behavior = "CRAWL_EVERYTHING"
+  }
+  lineage_configuration {
+    crawler_lineage_settings = "DISABLE"
+  }
+  lake_formation_configuration {
+    use_lake_formation_credentials = false
+  }
+  configuration = jsonencode({
+    Version = 1.0
+    Grouping = {
+      TableLevelConfiguration = 3
+    }
+  })
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  depends_on = [ aws_s3_bucket.raw_data, aws_s3_object.data_directory, aws_iam_role_policy_attachment.glue_service_role ]
 }
