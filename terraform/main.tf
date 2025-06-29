@@ -55,8 +55,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "raw_data" {
 }
 
 resource "aws_s3_object" "data_directory" {
-  bucket = aws_s3_bucket.raw_data.id,
-  key = "data/"
+  bucket = aws_s3_bucket.raw_data.id
+  key    = "data/"
 }
 
 resource "aws_s3_object" "temperature_data" {
@@ -144,5 +144,5 @@ resource "aws_glue_crawler" "name" {
     create_before_destroy = true
   }
 
-  depends_on = [ aws_s3_bucket.raw_data, aws_s3_object.data_directory, aws_iam_role_policy_attachment.glue_service_role ]
+  depends_on = [aws_s3_bucket.raw_data, aws_s3_object.data_directory, aws_iam_role_policy_attachment.glue_service_role]
 }
