@@ -4,7 +4,7 @@ import random
 import datetime
 
 def generate_temperature_csv(filename, num_records = 1000):
-    if num_records <= 0:
+    if num_records < 0:
         raise ValueError("Number of records must be a positive integer.")
     
     cities = ["New York", "Los Angeles", "Chicago", "Houston", "Phoenix"]

@@ -2,3 +2,4 @@
 terraform/terraform.tfstate
 terraform/.terraform.tfstate.lock.info
 terraform/.terraform/
+tests/__pycache__
