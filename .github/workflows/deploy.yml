@@ -1,4 +1,4 @@
-name: Infrastructure Deploymeny
+name: Infrastructure Deployment
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  TF_VERSION = 1.5.7
+  TF_VERSION: 1.5.7
   PYTHON_VERSION: '3.10'
 
 jobs:
@@ -52,7 +52,7 @@ jobs:
 
       - name: Run Python tests
         run: |
-          pytest tests/ -v --cov=scripts --cov-reports=xml
+          PYTHONPATH=. pytest tests/ -v --cov=scripts --cov-report=xml
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
@@ -78,7 +78,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{secrets.AWS_ACCESS_KEY_ID}}
-          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCES_KEY}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           aws-region: ${{ env.AWS_REGION}}
 
       - name: Terraform init
@@ -156,12 +156,19 @@ jobs:
           name: tfplan
           path: terraform
 
-      - name: Terraform plan
+      - name: Terraform apply
         working-directory: ./terraform
-        run: terraform plan -auto-approve tfplan
+        run: terraform apply -auto-approve tfplan
 
       - name: Save Terraform outputs
         working-directory: ./terraform
         run: terraform output -json > terraform_outputs.json
+
+      - name: Upload Terraform Output
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-outputs
+          path: terraform/terraform_outputs.json
+          retention-days: 7
       
 
