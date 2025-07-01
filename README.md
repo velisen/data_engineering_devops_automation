@@ -77,5 +77,3 @@ DevOopsDEAutomation/
 - Ensure AWS credentials have sufficient permissions for S3, Glue, and IAM.
 - Update `variables.tf` and `main.tf` as needed for your project specifics.
 
-## License
-MIT
